@@ -1,0 +1,77 @@
+version: '3'
+
+services:
+
+  permission:
+    container_name: "snippet-permission"
+    image: ccatalini/snippet-permission:latest
+    ports:
+      - "8081:8080"
+    environment:
+      DB_USER: ${PERMISSION_POSTGRES_USER}
+      DB_PASSWORD: ${PERMISSION_POSTGRES_PASSWORD}
+      DB_NAME: ${PERMISSION_POSTGRES_DB}
+    depends_on:
+      - permission-db
+
+  permission-db:
+    image: postgres:15
+    environment:
+      DB_USER: ${PERMISSION_POSTGRES_USER}
+      DB_PASSWORD: ${PERMISSION_POSTGRES_PASSWORD}
+      DB_NAME: ${PERMISSION_POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - permission-db-data:/var/lib/postgresql/data
+
+  manager:
+    container_name: "snippet-manager"
+    image: ccatalini/snippet-manager:latest
+    ports:
+      - "8082:8080"
+    environment:
+      DB_USER: ${MANAGER_POSTGRES_USER}
+      DB_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
+      DB_NAME: ${MANAGER_POSTGRES_DB}
+    depends_on:
+      - manager-db
+
+  manager-db:
+    image: postgres:15
+    environment:
+      DB_USER: ${MANAGER_POSTGRES_USER}
+      DB_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
+      DB_NAME: ${MANAGER_POSTGRES_DB}
+    ports:
+      - "5434:5432"
+    volumes:
+      - manager-db-data:/var/lib/postgresql/data
+
+  language:
+    container_name: "snippet-language"
+    image: ccatalini/snippet-language:latest
+    ports:
+      - "8083:8080"
+    environment:
+      DB_USER: ${LANGUAGE_POSTGRES_USER}
+      DB_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
+      DB_NAME: ${LANGUAGE_POSTGRES_DB}
+    depends_on:
+      - language-db
+
+  language-db:
+    image: postgres:15
+    environment:
+      DB_USER: ${LANGUAGE_POSTGRES_USER}
+      DB_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
+      DB_NAME: ${LANGUAGE_POSTGRES_DB}
+    ports:
+      - "5435:5432"
+    volumes:
+      - language-db-data:/var/lib/postgresql/data
+
+volumes:
+    permission-db-data:
+    manager-db-data:
+    language-db-data:
