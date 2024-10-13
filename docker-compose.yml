@@ -8,18 +8,18 @@ services:
     ports:
       - "8081:8080"
     environment:
-      DB_USER: ${PERMISSION_POSTGRES_USER}
-      DB_PASSWORD: ${PERMISSION_POSTGRES_PASSWORD}
-      DB_NAME: ${PERMISSION_POSTGRES_DB}
+      POSTGRES_USER: ${PERMISSION_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PERMISSION_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${PERMISSION_POSTGRES_DB}
     depends_on:
       - permission-db
 
   permission-db:
     image: postgres:15
     environment:
-      DB_USER: ${PERMISSION_POSTGRES_USER}
-      DB_PASSWORD: ${PERMISSION_POSTGRES_PASSWORD}
-      DB_NAME: ${PERMISSION_POSTGRES_DB}
+      POSTGRES_USER: ${PERMISSION_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PERMISSION_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${PERMISSION_POSTGRES_DB}
     ports:
       - "5433:5432"
     volumes:
@@ -31,18 +31,18 @@ services:
     ports:
       - "8082:8080"
     environment:
-      DB_USER: ${MANAGER_POSTGRES_USER}
-      DB_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
-      DB_NAME: ${MANAGER_POSTGRES_DB}
+      POSTGRES_USER: ${MANAGER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MANAGER_POSTGRES_DB}
     depends_on:
       - manager-db
 
   manager-db:
     image: postgres:15
     environment:
-      DB_USER: ${MANAGER_POSTGRES_USER}
-      DB_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
-      DB_NAME: ${MANAGER_POSTGRES_DB}
+      POSTGRES_US: ${MANAGER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MANAGER_POSTGRES_DB}
     ports:
       - "5434:5432"
     volumes:
@@ -54,22 +54,22 @@ services:
     ports:
       - "8083:8080"
     environment:
-      DB_USER: ${LANGUAGE_POSTGRES_USER}
-      DB_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
-      DB_NAME: ${LANGUAGE_POSTGRES_DB}
+      POSTGRES_US: ${LANGUAGE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
     depends_on:
-      - language-db
+        - language-db
 
   language-db:
     image: postgres:15
     environment:
-      DB_USER: ${LANGUAGE_POSTGRES_USER}
-      DB_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
-      DB_NAME: ${LANGUAGE_POSTGRES_DB}
+      POSTGRES_US: ${LANGUAGE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
     ports:
       - "5435:5432"
     volumes:
-      - language-db-data:/var/lib/postgresql/data
+        - language-db-data:/var/lib/postgresql/data
 
 volumes:
     permission-db-data:
