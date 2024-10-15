@@ -1,0 +1,11 @@
+.env
+
+# Visual Studio Code
+.vscode/
+
+# IntelliJ
+.idea/
+.env_ui
+
+.
+
