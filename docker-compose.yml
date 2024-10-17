@@ -40,7 +40,7 @@ services:
   manager-db:
     image: postgres:15
     environment:
-      POSTGRES_US: ${MANAGER_POSTGRES_USER}
+      POSTGRES_USER: ${MANAGER_POSTGRES_USER}
       POSTGRES_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
       POSTGRES_DB: ${MANAGER_POSTGRES_DB}
     ports:
@@ -54,7 +54,7 @@ services:
     ports:
       - "8083:8080"
     environment:
-      POSTGRES_US: ${LANGUAGE_POSTGRES_USER}
+      POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
       POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
       POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
     depends_on:
@@ -63,7 +63,7 @@ services:
   language-db:
     image: postgres:15
     environment:
-      POSTGRES_US: ${LANGUAGE_POSTGRES_USER}
+      POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
       POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
       POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
     ports:
