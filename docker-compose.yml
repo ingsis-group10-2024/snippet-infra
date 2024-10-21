@@ -27,7 +27,7 @@ services:
 
   manager:
     container_name: "snippet-manager"
-    image: ccatalini/snippet-manager:latest
+    image: ghcr.io/ingsis-group10-2024/snippet-manager-dev:latest
     ports:
       - "8082:8080"
     environment:
@@ -50,7 +50,7 @@ services:
 
   language:
     container_name: "snippet-language"
-    image: ccatalini/snippet-language:latest
+    image: ghcr.io/ingsis-group10-2024/snippet-language-dev:latest
     ports:
       - "8083:8080"
     environment:
