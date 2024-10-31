@@ -55,30 +55,30 @@ services:
     networks:
       - snippet-network
 
-  language:
-    container_name: "snippet-language"
+  runner:
+    container_name: "snippet-runner"
     image: ghcr.io/ingsis-group10-2024/snippet-runner-dev:latest
     ports:
       - "8083:8080"
     environment:
-      POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
+      POSTGRES_USER: ${RUNNER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${RUNNER_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${RUNNER_POSTGRES_DB}
     depends_on:
-      - language-db
+      - runner-db
     networks:
       - snippet-network
 
-  language-db:
+  runner-db:
     image: postgres:15
     environment:
-      POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
+      POSTGRES_USER: ${RUNNER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${RUNNER_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${RUNNER_POSTGRES_DB}
     ports:
       - "5435:5432"
     volumes:
-      - language-db-data:/var/lib/postgresql/data
+      - runner-db-data:/var/lib/postgresql/data
     networks:
       - snippet-network
 
@@ -114,7 +114,7 @@ services:
 volumes:
   permission-db-data:
   manager-db-data:
-  language-db-data:
+  runner-db-data:
 
 networks:
   snippet-network:
