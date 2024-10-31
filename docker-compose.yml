@@ -1,7 +1,6 @@
 version: '3'
 
 services:
-
   permission:
     container_name: "snippet-permission"
     image: ghcr.io/ingsis-group10-2024/snippet-permission-dev:latest
@@ -13,6 +12,8 @@ services:
       POSTGRES_DB: ${PERMISSION_POSTGRES_DB}
     depends_on:
       - permission-db
+    networks:
+      - snippet-network
 
   permission-db:
     image: postgres:15
@@ -24,6 +25,8 @@ services:
       - "5433:5432"
     volumes:
       - permission-db-data:/var/lib/postgresql/data
+    networks:
+      - snippet-network
 
   manager:
     container_name: "snippet-manager"
@@ -36,6 +39,8 @@ services:
       POSTGRES_DB: ${MANAGER_POSTGRES_DB}
     depends_on:
       - manager-db
+    networks:
+      - snippet-network
 
   manager-db:
     image: postgres:15
@@ -47,10 +52,12 @@ services:
       - "5434:5432"
     volumes:
       - manager-db-data:/var/lib/postgresql/data
+    networks:
+      - snippet-network
 
   language:
     container_name: "snippet-language"
-    image: ghcr.io/ingsis-group10-2024/snippet-language-dev:latest
+    image: ghcr.io/ingsis-group10-2024/snippet-runner-dev:latest
     ports:
       - "8083:8080"
     environment:
@@ -58,7 +65,9 @@ services:
       POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
       POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
     depends_on:
-        - language-db
+      - language-db
+    networks:
+      - snippet-network
 
   language-db:
     image: postgres:15
@@ -69,9 +78,44 @@ services:
     ports:
       - "5435:5432"
     volumes:
-        - language-db-data:/var/lib/postgresql/data
+      - language-db-data:/var/lib/postgresql/data
+    networks:
+      - snippet-network
+
+  webserver:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:ro
+    networks:
+      - snippet-network
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - snippet-network
+ 
+  printscript-ui:
+    image: ghcr.io/ingsis-group10-2024/printscript-ui:latest
+    container_name: "printscript-ui"
+    ports:
+      - "8084:80"
+    networks:
+      - snippet-network
 
 volumes:
-    permission-db-data:
-    manager-db-data:
-    language-db-data:
+  permission-db-data:
+  manager-db-data:
+  language-db-data:
+
+networks:
+  snippet-network:
+    driver: bridge
