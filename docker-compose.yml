@@ -82,39 +82,67 @@ services:
     networks:
       - snippet-network
 
-  webserver:
-    image: nginx:latest
+#  webserver:
+#    image: nginx:latest
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    restart: always
+#    volumes:
+#      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+#      - ./certbot/www/:/var/www/certbot/:rw
+#      - ./certbot/conf/:/etc/letsencrypt/:ro
+#    networks:
+#      - snippet-network
+#
+#  certbot:
+#    image: certbot/certbot:latest
+#    volumes:
+#      - ./certbot/conf:/etc/letsencrypt
+#      - ./certbot/www:/var/www/certbot
+#    networks:
+#      - snippet-network
+#
+#  printscript-ui:
+#    image: ghcr.io/ingsis-group10-2024/printscript-ui:latest
+#    container_name: "printscript-ui"
+#    ports:
+#      - "8084:80"
+#    networks:
+#      - snippet-network
+
+  api:
+    container_name: "asset_service"
+    image: ghcr.io/austral-ingsis/snippet-asset-service:latest
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:8080"
+    environment:
+      AZURE_HOST: "http://azurite"
+      NEW_RELIC_APP_NAME: "asset-service"
+      NEW_RELIC_AGENT_ENABLED: true
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+    networks:
+      - snippet-network
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: "azurite"
+    hostname: azurite
     restart: always
-    volumes:
-      - ./nginx/conf/:/etc/nginx/conf.d/:ro
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:ro
-    networks:
-      - snippet-network
-
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    networks:
-      - snippet-network
- 
-  printscript-ui:
-    image: ghcr.io/ingsis-group10-2024/printscript-ui:latest
-    container_name: "printscript-ui"
     ports:
-      - "8084:80"
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - blob:/workspace
     networks:
       - snippet-network
-
 volumes:
   permission-db-data:
   manager-db-data:
   runner-db-data:
+  blob:
+    external: false
 
 networks:
   snippet-network:
