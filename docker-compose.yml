@@ -37,6 +37,7 @@ services:
       POSTGRES_USER: ${MANAGER_POSTGRES_USER}
       POSTGRES_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
       POSTGRES_DB: ${MANAGER_POSTGRES_DB}
+      AZURE_CONNECTION_STRING: ${AZURE_CONNECTION_STRING}
     depends_on:
       - manager-db
     networks:
@@ -104,7 +105,9 @@ services:
       - snippet-network
  
   printscript-ui:
-    image: ghcr.io/ingsis-group10-2024/printscript-ui:latest
+    # Para correrlo desde la VM:
+    # image: ghcr.io/ingsis-group10-2024/printscript-ui:latest
+    image: printscript-ui-local  # Para correrlo de forma local
     container_name: "printscript-ui"
     ports:
       - "8084:80"
