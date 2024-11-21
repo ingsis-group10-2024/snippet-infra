@@ -1,0 +1,168 @@
+version: '3'
+
+services:
+  permission:
+    container_name: "snippet-permission"
+    image: ghcr.io/ingsis-group10-2024/snippet-permission-prod:latest
+    ports:
+      - "8081:8080"
+    environment:
+      POSTGRES_USER: ${PERMISSION_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PERMISSION_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${PERMISSION_POSTGRES_DB}
+    depends_on:
+      - permission-db
+    networks:
+      - snippet-network
+
+  permission-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${PERMISSION_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PERMISSION_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${PERMISSION_POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - permission-db-data:/var/lib/postgresql/data
+    networks:
+      - snippet-network
+
+  manager:
+    container_name: "snippet-manager"
+    image: ghcr.io/ingsis-group10-2024/snippet-manager-prod:latest
+    ports:
+      - "8082:8080"
+    environment:
+      POSTGRES_USER: ${MANAGER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MANAGER_POSTGRES_DB}
+      AZURE_CONNECTION_STRING: ${AZURE_CONNECTION_STRING}
+      AUTH_CLIENT_ID_M2M: ${AUTH_CLIENT_ID_M2M}
+      AUTH_CLIENT_SECRET_M2M: ${AUTH_CLIENT_SECRET_M2M}
+      AUTH_ISSUER_URI: ${AUTH_ISSUER_URI}
+      AUTH0_AUDIENCE_M2M: ${AUTH0_AUDIENCE_M2M}
+    depends_on:
+      - manager-db
+      - redis
+    networks:
+      - snippet-network
+
+  manager-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${MANAGER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MANAGER_POSTGRES_DB}
+    ports:
+      - "5434:5432"
+    volumes:
+      - manager-db-data:/var/lib/postgresql/data
+    networks:
+      - snippet-network
+
+  runner:
+    container_name: "snippet-runner"
+    image: ghcr.io/ingsis-group10-2024/snippet-runner-prod:latest
+    ports:
+      - "8083:8080"
+    environment:
+      POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
+    depends_on:
+      - runner-db
+      - redis
+    networks:
+      - snippet-network
+
+  runner-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
+    ports:
+      - "5435:5432"
+    volumes:
+      - runner-db-data:/var/lib/postgresql/data
+    networks:
+      - snippet-network
+
+  webserver:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:ro
+    networks:
+      - snippet-network
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - snippet-network
+
+  printscript-ui:
+    # Para correrlo desde la VM: ghcr.io/ingsis-group10-2024/printscript-ui:latest
+    #  Para correrlo de forma local: printscript-ui-local
+    image: ghcr.io/ingsis-group10-2024/printscript-ui:latest
+    container_name: "printscript-ui"
+    ports:
+      - "8084:80"
+    networks:
+      - snippet-network
+
+  api:
+    container_name: "asset_service"
+    image: ghcr.io/austral-ingsis/snippet-asset-service:latest
+    ports:
+      - "8080:8080"
+    environment:
+      AZURE_HOST: "http://azurite"
+      NEW_RELIC_APP_NAME: "asset-service"
+      NEW_RELIC_AGENT_ENABLED: true
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+    networks:
+      - snippet-network
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: "azurite"
+    hostname: azurite
+    restart: always
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - blob:/workspace
+    networks:
+      - snippet-network
+
+  redis:
+    image: redis:latest
+    container_name: "redis"
+    ports:
+      - "6379:6379"
+    networks:
+      - snippet-network
+    restart: always
+
+volumes:
+  permission-db-data:
+  manager-db-data:
+  runner-db-data:
+  blob:
+    external: false
+
+networks:
+  snippet-network:
+    driver: bridge
