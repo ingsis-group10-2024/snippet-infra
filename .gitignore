@@ -7,5 +7,4 @@
 .idea/
 .env_ui
 
-.
-
+.gradle.properties
