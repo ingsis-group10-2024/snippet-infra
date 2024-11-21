@@ -19,6 +19,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd snippet-infra
-            docker compose -f docker-compose.dev.yml stop
+            docker compose -f docker-compose.yml stop
             git pull
-            docker compose -f docker-compose.dev.yml up -d --build
+            docker compose -f docker-compose.yml up -d --build
