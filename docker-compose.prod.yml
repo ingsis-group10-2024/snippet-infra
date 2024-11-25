@@ -3,7 +3,7 @@ version: '3'
 services:
   permission:
     container_name: "snippet-permission"
-    image: ghcr.io/ingsis-group10-2024/snippet-permission-dev:latest
+    image: ghcr.io/ingsis-group10-2024/snippet-permission-prod:latest
     ports:
       - "8081:8080"
     environment:
@@ -34,7 +34,7 @@ services:
 
   manager:
     container_name: "snippet-manager"
-    image: ghcr.io/ingsis-group10-2024/snippet-manager-dev:latest
+    image: ghcr.io/ingsis-group10-2024/snippet-manager-prod:latest
     ports:
       - "8082:8080"
     environment:
@@ -71,7 +71,7 @@ services:
 
   runner:
     container_name: "snippet-runner"
-    image: ghcr.io/ingsis-group10-2024/snippet-runner-dev:latest
+    image: ghcr.io/ingsis-group10-2024/snippet-runner-prod:latest
     ports:
       - "8083:8080"
     environment:
@@ -124,7 +124,7 @@ services:
 
   printscript-ui:
     # Para correrlo desde la VM: ghcr.io/ingsis-group10-2024/printscript-ui:latest
-    #  Para correrlo de forma local: printscript-ui-local 
+    #  Para correrlo de forma local: printscript-ui-local
     image: ghcr.io/ingsis-group10-2024/printscript-ui:latest
     container_name: "printscript-ui"
     ports:
@@ -177,4 +177,4 @@ volumes:
 
 networks:
   snippet-network:
-    driver: bridge 
+    driver: bridge
