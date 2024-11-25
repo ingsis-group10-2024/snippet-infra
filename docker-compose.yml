@@ -121,7 +121,7 @@ services:
       - ./certbot/www:/var/www/certbot
     networks:
       - snippet-network
- 
+
   printscript-ui:
     # Para correrlo desde la VM: ghcr.io/ingsis-group10-2024/printscript-ui:latest
     #  Para correrlo de forma local: printscript-ui-local 
