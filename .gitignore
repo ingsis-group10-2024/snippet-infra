@@ -6,10 +6,10 @@
 # IntelliJ
 .idea/
 .env_ui
-.
+
+.gradle.properties
 
 # certbot
 certbot/conf/accounts/**
 certbot/conf/archive/**
 certbot/conf/live/**
-
