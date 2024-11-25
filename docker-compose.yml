@@ -10,6 +10,10 @@ services:
       POSTGRES_USER: ${PERMISSION_POSTGRES_USER}
       POSTGRES_PASSWORD: ${PERMISSION_POSTGRES_PASSWORD}
       POSTGRES_DB: ${PERMISSION_POSTGRES_DB}
+      NEW_RELIC_APP_NAME: ${NEW_RELIC_APP_NAME_PERMISSION}
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+      NEW_RELIC_AGENT_ENABLED: "true"
+      NEW_RELIC_LOG_LEVEL: "info"
     depends_on:
       - permission-db
     networks:
@@ -37,8 +41,18 @@ services:
       POSTGRES_USER: ${MANAGER_POSTGRES_USER}
       POSTGRES_PASSWORD: ${MANAGER_POSTGRES_PASSWORD}
       POSTGRES_DB: ${MANAGER_POSTGRES_DB}
+      AZURE_CONNECTION_STRING: ${AZURE_CONNECTION_STRING}
+      AUTH_CLIENT_ID_M2M: ${AUTH_CLIENT_ID_M2M}
+      AUTH_CLIENT_SECRET_M2M: ${AUTH_CLIENT_SECRET_M2M}
+      AUTH_ISSUER_URI: ${AUTH_ISSUER_URI}
+      AUTH0_AUDIENCE_M2M: ${AUTH0_AUDIENCE_M2M}
+      NEW_RELIC_APP_NAME: ${NEW_RELIC_APP_NAME_MANAGER}
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+      NEW_RELIC_AGENT_ENABLED: "true"
+      NEW_RELIC_LOG_LEVEL: "info"
     depends_on:
       - manager-db
+      - redis
     networks:
       - snippet-network
 
@@ -55,8 +69,8 @@ services:
     networks:
       - snippet-network
 
-  language:
-    container_name: "snippet-language"
+  runner:
+    container_name: "snippet-runner"
     image: ghcr.io/ingsis-group10-2024/snippet-runner-dev:latest
     ports:
       - "8083:8080"
@@ -64,12 +78,17 @@ services:
       POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
       POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
       POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
+      NEW_RELIC_APP_NAME: ${NEW_RELIC_APP_NAME_RUNNER}
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+      NEW_RELIC_AGENT_ENABLED: "true"
+      NEW_RELIC_LOG_LEVEL: "info"
     depends_on:
-      - language-db
+      - runner-db
+      - redis
     networks:
       - snippet-network
 
-  language-db:
+  runner-db:
     image: postgres:15
     environment:
       POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
@@ -78,7 +97,7 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - language-db-data:/var/lib/postgresql/data
+      - runner-db-data:/var/lib/postgresql/data
     networks:
       - snippet-network
 
@@ -102,7 +121,7 @@ services:
       - ./certbot/www:/var/www/certbot
     networks:
       - snippet-network
- 
+
   printscript-ui:
     image: ghcr.io/ingsis-group10-2024/printscript-ui:latest
     container_name: "printscript-ui"
@@ -111,10 +130,48 @@ services:
     networks:
       - snippet-network
 
+  api:
+    container_name: "asset_service"
+    image: ghcr.io/austral-ingsis/snippet-asset-service:latest
+    ports:
+      - "8080:8080"
+    environment:
+      AZURE_HOST: "http://azurite"
+      NEW_RELIC_APP_NAME: "asset-service"
+      NEW_RELIC_AGENT_ENABLED: true
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+    networks:
+      - snippet-network
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: "azurite"
+    hostname: azurite
+    restart: always
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - blob:/workspace
+    networks:
+      - snippet-network
+
+  redis:
+    image: redis:latest
+    container_name: "redis"
+    ports:
+      - "6379:6379"
+    networks:
+      - snippet-network
+    restart: always
+
 volumes:
   permission-db-data:
   manager-db-data:
-  language-db-data:
+  runner-db-data:
+  blob:
+    external: false
 
 networks:
   snippet-network:
