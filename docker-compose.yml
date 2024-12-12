@@ -75,29 +75,12 @@ services:
     ports:
       - "8083:8080"
     environment:
-      POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
       NEW_RELIC_APP_NAME: ${NEW_RELIC_APP_NAME_RUNNER}
       NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
       NEW_RELIC_AGENT_ENABLED: "true"
       NEW_RELIC_LOG_LEVEL: "info"
     depends_on:
-      - runner-db
       - redis
-    networks:
-      - snippet-network
-
-  runner-db:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: ${LANGUAGE_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${LANGUAGE_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${LANGUAGE_POSTGRES_DB}
-    ports:
-      - "5435:5432"
-    volumes:
-      - runner-db-data:/var/lib/postgresql/data
     networks:
       - snippet-network
 
@@ -123,9 +106,7 @@ services:
       - snippet-network
 
   printscript-ui:
-    # Para correrlo desde la VM: ghcr.io/ingsis-group10-2024/printscript-ui:latest
-    #  Para correrlo de forma local: printscript-ui-local 
-    image: ghcr.io/ingsis-group10-2024/printscript-ui:latest
+    image: ghcr.io/ingsis-group10-2024/printscript-ui-dev:latest
     container_name: "printscript-ui"
     ports:
       - "8084:80"
@@ -171,10 +152,9 @@ services:
 volumes:
   permission-db-data:
   manager-db-data:
-  runner-db-data:
   blob:
     external: false
 
 networks:
   snippet-network:
-    driver: bridge 
+    driver: bridge
